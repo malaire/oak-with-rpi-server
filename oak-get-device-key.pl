@@ -12,8 +12,12 @@
 #   - 1) start Oak in config mode and connect to its AP
 #   - 2) run this script
 #
+#   OUTPUT_DIR
+#   - directory where to save the key
+#     - usually core_keys inside particle-server directory
+#
 # EXAMPLE
-#   perl oak-get-device-key.pl /home/pi/particle-server
+#   perl oak-get-device-key.pl /home/pi/particle-server/core_keys
 #
 # REQUIREMENTS
 #   - curl
