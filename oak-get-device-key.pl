@@ -47,7 +47,8 @@
 
 use v5.20;
 use warnings FATAL => 'all';
-use JSON qw( decode_json );
+use JSON         qw( decode_json );
+use MIME::Base64 qw( encode_base64 );
 
 if (@ARGV != 1) {
   say "USAGE: $0 OUTPUT_DIR";
@@ -68,8 +69,7 @@ my $id;
 }
 
 # GET DEVICE PUBLIC KEY
-# - TODO: Should the filename have '.pub.der' extension ?
-my $key;
+my $key_pem;
 {
   my $json_str = `curl -q -s --connect-timeout 5 http://192.168.0.1/public-key`;
   my $json_decoded = decode_json($json_str);
@@ -78,8 +78,12 @@ my $key;
     exit 1;
   }
 
-  my $key_hex = $$json_decoded{'b'};
-  $key = pack 'H*', $key_hex;
+  my $key_der_hex = $$json_decoded{'b'};
+  my $key_der = pack 'H*', $key_der_hex;
+  $key_pem =
+    "-----BEGIN PUBLIC KEY-----\n" .
+    encode_base64($key_der) .
+    "-----END PUBLIC KEY-----\n";  
 }
 
 # SAVE KEY TO FILE
@@ -90,5 +94,5 @@ if (! open($fh, '>', $output_file)) {
   say "ERROR: Can't create file $output_file";
   exit 1;
 }
-print $fh $key;
+print $fh $key_pem;
 close $fh;
